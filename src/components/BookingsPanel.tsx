@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { BOOKINGS } from "../data/bookings";
 import { ActionLinks, PhoneIcon, formatPhone } from "./ActionLinks";
+import { GmailBookingSearch } from "./GmailBookingSearch";
+
+// The vendor name is the strongest search signal — take the contact string up
+// to its separator ("Major Marine Tours · Harbor 360 dock"), else the booking
+// name up to an em dash.
+function vendorOf(contact: string, name: string): string {
+  const fromContact = contact.split("·")[0].trim();
+  if (fromContact) return fromContact;
+  return name.split("—")[0].trim();
+}
 
 export interface BookingConfirmation {
   conf?: string;
@@ -179,6 +189,11 @@ export function BookingsPanel({ confirmations, setConfirmations }: Props) {
                         autoCapitalize="off"
                       />
                     </div>
+
+                    <GmailBookingSearch
+                      vendor={vendorOf(b.contact, b.name)}
+                      onUse={(c) => updateConf(b.id, { conf: c })}
+                    />
 
                     {b.notes && (
                       <p className="mt-3 text-xs italic text-ink-500">

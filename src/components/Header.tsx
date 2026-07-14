@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { TabKey } from "../App";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   bookingsTotal: number;
   packedDone: number;
   packedTotal: number;
+  syncPill?: ReactNode;
 }
 
 interface TabDef {
@@ -35,6 +37,7 @@ export function Header({
   bookingsTotal,
   packedDone,
   packedTotal,
+  syncPill,
 }: Props) {
   return (
     <header className="flex shrink-0 flex-col gap-1 border-b border-ink-200 bg-white px-3 pb-1 pt-2 sm:px-6 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:py-0">
@@ -54,6 +57,7 @@ export function Header({
         >
           PDF
         </a>
+        {syncPill}
       </div>
       {/* Desktop tabs — mobile navigation lives in the bottom bar. */}
       <nav className="scroll-soft -mx-1 hidden flex-nowrap items-center gap-1 overflow-x-auto pb-1 lg:mx-0 lg:flex lg:flex-wrap lg:overflow-visible lg:pb-0">

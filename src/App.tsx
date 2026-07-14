@@ -19,6 +19,8 @@ import { SEED_EXPENSES } from "./data/seedExpenses";
 import { useStepNavigation } from "./hooks/useStepNavigation";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { useTripDate } from "./hooks/useTripDate";
+import { useSharedTripState } from "./hooks/useSharedTripState";
+import { GroupSyncSetup, GroupSyncPill } from "./components/GroupSync";
 
 export type TabKey =
   | "today"
@@ -70,6 +72,24 @@ export default function App() {
     "alaska.dayNotes",
     {},
   );
+
+  // Group sync (opt-in): keeps expenses, confirmations, and day notes in step
+  // with the other travelers via a shared Upstash blob. Packing stays local.
+  const sync = useSharedTripState<Expense, BookingConfirmation>({
+    expenses,
+    setExpenses,
+    confirmations,
+    setConfirmations,
+    dayNotes,
+    setDayNotes,
+  });
+  // Show the "sync with the group?" prompt once, only if never seen and not
+  // already connected. Skipping is remembered so it never nags.
+  const [syncPromptSeen, setSyncPromptSeen] = useLocalStorage<boolean>(
+    "alaska.sync.promptSeen",
+    false,
+  );
+  const showSyncSetup = !sync.config && !syncPromptSeen;
 
   // Arrow-key navigation only matters in Journey + Days
   useStepNavigation({
@@ -170,7 +190,27 @@ export default function App() {
         bookingsTotal={BOOKINGS.length}
         packedDone={packedDone}
         packedTotal={PACKING.length}
+        syncPill={
+          sync.config ? (
+            <GroupSyncPill
+              name={sync.config.name}
+              status={sync.status}
+              lastSyncedAt={sync.lastSyncedAt}
+              onDisconnect={sync.disconnect}
+            />
+          ) : null
+        }
       />
+
+      {showSyncSetup && (
+        <GroupSyncSetup
+          onConnect={(cfg) => {
+            sync.connect(cfg);
+            setSyncPromptSeen(true);
+          }}
+          onSkip={() => setSyncPromptSeen(true)}
+        />
+      )}
 
       <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Map: full-bleed on the mobile Map tab, left ~55% on desktop. */}

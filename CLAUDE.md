@@ -3,7 +3,7 @@
 Guidance for Claude Code working in this repo. (Project overview & setup live in [README.md](README.md).)
 
 ## What this is
-A static, backend-less SPA trip planner (Vite + React 18 + TS + Tailwind + React-Leaflet). All user edits persist to `localStorage`; there is no server or database.
+A static, backend-less SPA trip planner (Vite + React 18 + TS + Tailwind + React-Leaflet). All user edits persist to `localStorage`; there is no server or database — **except** one optional, opt-in serverless endpoint (`api/trip-state.ts`) for cross-device group sync, dormant unless `TRIP_CODE` + Upstash env vars are set. See README's "group sync & Gmail" section.
 
 ## Conventions & gotchas
 - **The itinerary is data, not code.** Stops, days, bookings, budget, packing, and contacts all live in `src/data/`. Change trip content there — don't hardcode dates/places into components.
